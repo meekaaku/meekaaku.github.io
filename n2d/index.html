@@ -17,7 +17,7 @@
 
                 const decimal_words = decimal ? ' ޕޯއިންޓް ' + decimal.split('').map(x => n2d(x)).join(' ') : '';
                 const num_words = n2d(num);
-                const random_unit = unit[Math.floor(Math.random() * unit.length)];
+                const random_unit = num < 11 ? '' : unit[Math.floor(Math.random() * unit.length)];
 
 
                 const result = `${num_words}  ${decimal_words}  ${random_unit}`;
