@@ -6,17 +6,119 @@
 		<meta name="viewport" content="width=device-width" />
  
         <script>
-            function onInput()
+            function check(e)
             {
-                const num = document.getElementById("num").value;
-                const result = n2d(num);
+                e.preventDefault();
+                const unit = ['ހިނި','ރުފިޔާ','ބަޖިޔާ','ހެދިކާ','މީހުން','ލާރި','ވެލިފުއް'];
+                const num_text = document.getElementById("num").value;
+
+                const [num, decimal] = num_text.split('.');
+
+
+                const decimal_words = decimal ? ' ޕޯއިންޓް ' + decimal.split('').map(x => n2d(x)).join(' ') : '';
+                const num_words = n2d(num);
+                const random_unit = unit[Math.floor(Math.random() * unit.length)];
+
+
+                const result = `${num_words}  ${decimal_words}  ${random_unit}`;
+                document.getElementById("answer").innerHTML = result;
                 console.log(result);
             }
 
-            function n2d(num)
+
+
+            function n2d(num, fix = '')
             {
-                return 'some long text';
-            }
+                const limits = [
+                    {limit: 1000000000000000000000, prefix: 'ސެކްސްޓިލިއަން'},
+                    {limit: 1000000000000000000, prefix: 'ކުއަންޓިލިއަން'},
+                    {limit: 1000000000000000, prefix: 'ކުއަޑްރިލިއަން'},
+                    {limit: 1000000000000, prefix: 'ޓްރިލިއަން'},
+                    {limit: 1000000000, prefix: 'ބިލިއަން'},
+                    {limit: 1000000, prefix: 'މިލިއަން'},
+                    {limit: 100000, prefix: 'ލައްކަ'},
+                    {limit: 1000, prefix: 'ހާސް'},
+                    {limit: 200, prefix: 'ދުއިސައްތަ'},
+                    {limit: 100, prefix: 'ސަތޭކަ'},
+                    {limit: 90, prefix: 'ނުވަދިހަ'},
+                    {limit: 80, prefix: 'އަށްޑިހަ'},
+                    {limit: 70, prefix: 'ހަތްދިހަ'},
+                    {limit: 60, prefix: 'ފަސްދޯޅަސް'},
+                    {limit: 50, prefix: 'ފަންސާސް'},
+                    {limit: 40, prefix: 'ސާޅީސް'},
+                    {limit: 30, prefix: 'ތިރީސް'},
+                    {limit: 29, prefix: 'ނަވާވީސް'},
+                    {limit: 28, prefix: 'އަށާވީސް'},
+                    {limit: 27, prefix: 'ހަތާވީސް'},
+                    {limit: 26, prefix: 'ސައްބީސް'},
+                    {limit: 25, prefix: 'ފަންސަވީސް'},
+                    {limit: 24, prefix: 'ސައްވީސް'},
+                    {limit: 23, prefix: 'ތޭވީސް'},
+                    {limit: 22, prefix: 'ބާވީސް'},
+                    {limit: 21, prefix: 'އެކާވީސް'},
+                    {limit: 20, prefix: 'ވިހި'},
+                    {limit: 19, prefix: 'ނަވާރަ'},
+                    {limit: 18, prefix: 'އަށާރަ'},
+                    {limit: 17, prefix: 'ސަތާރަ'},
+                    {limit: 16, prefix: 'ސޯޅަ'},
+                    {limit: 15, prefix: 'ފަނަރަ'},
+                    {limit: 14, prefix: 'ސާދަ'},
+                    {limit: 13, prefix: 'ތޭރަ'},
+                    {limit: 12, prefix: 'ބާރަ'},
+                    {limit: 11, prefix: 'އެގާރަ'},
+                    {limit: 10, prefix: 'ދިހަ', postfix: 'ދިހައެއް'},
+                    {limit: 9,  prefix: 'ނުވަ', postfix: 'ނުވައެއް'},
+                    {limit: 8,  prefix: 'އަށް', postfix: 'އަށެއް'},
+                    {limit: 7,  prefix: 'ހަތް', postfix: 'ހަތެއް'},
+                    {limit: 6,  prefix: 'ހަ', postfix: 'ހައެއް'},
+                    {limit: 5,  prefix: 'ފަސް', postfix: 'ފަހެއް'},
+                    {limit: 4,  prefix: 'ހަތަރު', postfix: 'ހަތަރެއް'},
+                    {limit: 3,  prefix: 'ތިން', postfix: 'ތިނެއް'},
+                    {limit: 2,  prefix: 'ދެ', postfix: 'ދޭއް'},
+                    {limit: 1,  prefix: 'އެއް', postfix: 'އެކެއް'},
+                    {limit: 0,  prefix: 'ސުން', postfix: 'ސުމެއް'},
+                ];
+
+                num = Number(num);
+                if(isNaN(num)) return 'ނަންބަރެއް ނޫން';
+                if (num === 0 ) return 'ސުމެއް';
+                if (num < 0) return 'މައިނަސް' + ' ' + n2d(Math.abs(num));
+
+                for(const p of limits){
+                    
+                    if((num < 200 || num > 299) && p.limit === 200) continue;
+                    if(num >= p.limit) 
+                    {
+                        
+                        const multiple = Math.floor(num / p.limit)
+                        const remainder = num - multiple * p.limit;
+
+                        if(fix === '')
+                        {
+                            if(num === p.limit && num <= 10)
+                                fix = 'postfix';
+                            else 
+                                fix = 'prefix';
+                        }
+
+                        let multiple_text;
+                        let remainder_text;
+
+                        if(multiple === 1 && Math.log10(p.limit) % 1 === 0 && p.limit >= 1000)
+                            multiple_text = 'އެއް';
+                        else if(multiple === 1)
+                            multiple_text = '';
+                        else
+                            multiple_text = n2d(multiple, fix);
+
+                        remainder_text = remainder === 0 ? '' : n2d(remainder, fix);
+                        return multiple_text + ' ' + p[fix] + ' ' + remainder_text;
+                    }
+                }
+
+            } 
+
+
         </script>
 	</head>
 	<body>
@@ -24,12 +126,14 @@
 
         <div class="container" >
             <div class="columns">
-                <div class="column col-xs-11 col-md-8 col-4 col-mx-auto my-2" >
+                <div class="column col-xs-11 col-md-8 col-4 col-mx-auto " style="margin-top: 10rem" >
                     <form>
                         <div class="input-group">
                         <input id="num" class="form-input input-sm" type="text" placeholder="ނަންބަރެއް ލިޔެލާ">
-                        <button class="btn btn-primary input-group-btn btn-sm" onclick="onInput()">ޗެކް</button>
+                        <button class="btn btn-primary input-group-btn btn-sm" onclick="check(event)">ޗެކް</button>
                         </div>
+
+                        <p id="answer" style="text-align: right; margin-top: 3rem;"></p>
                     </form>
                 </div>
             </div>
